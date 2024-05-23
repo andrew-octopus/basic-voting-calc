@@ -45,7 +45,7 @@ class UserNFTs(TypedDict):
             if value not in [0, 1, None]:
                 raise ValueError(f"Invalid value for key {key}. Must be 0 or 1.")
 
-
+    
 @dataclass
 class NFTWeights(TypedDict):
     """
@@ -77,5 +77,3 @@ class NFTWeights(TypedDict):
     LIVE_TRACK_6: Optional[float]
     LIVE_TRACK_7: Optional[float]
     LIVE_TRACK_8: Optional[float]
-
-
