@@ -1,3 +1,4 @@
+import numpy as np
 from typing import Dict
 
 def calc_voter_weights_from_NFT_weight(voters_dict: Dict[str, dict], 
@@ -13,10 +14,11 @@ def calc_voter_weights_from_NFT_weight(voters_dict: Dict[str, dict],
     - dict: A dictionary of weights for each voter.
     """
 
-    import numpy as np
+
+    first_voter = voters_dict.get(list(voters_dict.keys())[0])
 
     # Check if keys are in the same order
-    if list(voters_dict.keys()) != list(weights_dict.keys()):
+    if list(first_voter.keys()) != list(weights_dict.keys()):
         raise ValueError("Keys in voters_dict and weights_dict are not in the same order")
 
     new_dict = {}
