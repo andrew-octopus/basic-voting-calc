@@ -6,7 +6,7 @@ from typing import TypedDict, Optional
 from dataclasses import dataclass
 
 @dataclass
-class UserNFTs(TypedDict):
+class UserNFTs(TypedDict, total = False):
     """
     Class for recording which NFTs a User has. 
     """
@@ -36,18 +36,9 @@ class UserNFTs(TypedDict):
     LIVE_TRACK_6: Optional[int]
     LIVE_TRACK_7: Optional[int]
     LIVE_TRACK_8: Optional[int]
-
-    def post_init_(self):
-        """
-        Check to be sure that all values are set are either 0 or 1. 
-        """
-        for key, value in self.items():
-            if value not in [0, 1, None]:
-                raise ValueError(f"Invalid value for key {key}. Must be 0 or 1.")
-
     
 @dataclass
-class NFTWeights(TypedDict):
+class NFTWeights(TypedDict, total = False):
     """
     Class for recording which NFTs a User has. 
     """
@@ -77,3 +68,25 @@ class NFTWeights(TypedDict):
     LIVE_TRACK_6: Optional[float]
     LIVE_TRACK_7: Optional[float]
     LIVE_TRACK_8: Optional[float]
+
+# Voter was designed by Joan. 
+# TOODO: Be sure to give credit. 
+class Voter:
+
+    def __init__(self, vote = None, nfts = [], hasTeaAccount = True, hasWalletConnected = True, isCandidate = False):
+
+        # The candidate that the voter prefers.
+        self.vote = vote
+
+        # List of NFTs that this voter holds.
+        self.nfts = nfts 
+
+        # Voter has an TEA account. Must be True to participate in voting.
+        self.hasTeaAccount = hasTeaAccount
+
+        # Voter has connected their wallet. Must be true to participate in voting.
+        self.hasWalletConnected = hasWalletConnected
+
+        # Candidates are not allowed to vote (?)
+        self.isCandidate = isCandidate
+        
