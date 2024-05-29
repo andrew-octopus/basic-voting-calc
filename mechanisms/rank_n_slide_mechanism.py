@@ -5,7 +5,7 @@ each voter has a score (based on their achievments) and assigns a proportion of 
 """
 
 from typing import Any, Dict, Callable
-from voting_mechanism import VotingMechanism
+from mechanisms.voting_mechanism import VotingMechanism
 
 #Set default amounts for each NFT to contribute to individual 
 DEFAULT_NFT_SCORES = {
@@ -76,11 +76,11 @@ class RankAndSlide(VotingMechanism):
 
         # Sort candidates by their score, and return the winner (along with the detailed scores)
         sorted_candidates = dict(sorted(candidate_scores.items(), key=lambda x: x[1], reverse=True))
-        winner = sorted_candidates[0]
+        winner = max(candidate_scores, key=candidate_scores.get)
 
         return winner, candidate_scores
 
-    def normalize_proportions(choice: Dict[str, float]):
+    def normalize_proportions(self, choice: Dict[str, float]):
         # So that if a vote is passed in that doesn't add up to 1 the numbers get adjusted.
         # E.g. 0.1 & 3 & 0.4 & 5 -> 0.1/8.5 ~ 0.011 & 3/8.5 = 0.035 & 0.4/8.5 = 0.047 & 5/8.5 = 0.59
         total = sum(choice.values())
@@ -88,7 +88,7 @@ class RankAndSlide(VotingMechanism):
             choice[candidate] = proportion / total
         return choice
 
-    def get_default_weighing_mechanism(voter: Dict[str, int]):
+    def get_default_weighing_mechanism(self, voter: Dict[str, int]):
         score = 0
         for nft, amount in voter.items():
             if amount > 0:
