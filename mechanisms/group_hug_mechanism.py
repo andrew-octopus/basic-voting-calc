@@ -6,7 +6,7 @@ a weight and rules by which points are distributed.
 from typing import Any, Dict, List
 
 from custom_types import Voter
-from voting_mechanism import VotingMechanism
+from mechanisms.voting_mechanism import VotingMechanism
 
 #Set default amounts for each NFT to contribute to individual 
 DEFAULT_NFT_WEIGHTS = {

@@ -5,7 +5,7 @@ each voter has a weight and the total plurality calculation is used.
 """
 
 from typing import Any, Dict
-from voting_mechanism import VotingMechanism
+from mechanisms.voting_mechanism import VotingMechanism
 
 class SingleChoiceWeightedPlurality(VotingMechanism):
     """
