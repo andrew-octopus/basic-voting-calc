@@ -10,11 +10,11 @@ from mechanisms.voting_mechanism import VotingMechanism
 
 #Set default amounts for each NFT to contribute to individual 
 DEFAULT_NFT_WEIGHTS = {
-    "FUND_MOD1": 3.0,
-    "FUND_MOD2": 3.0,
-    "FUND_MOD3": 3.0,
-    "FUND_MOD4": 3.0,
-    "FUND_MOD5": 3.0,
+    "FUND_MOD_1": 3.0,
+    "FUND_MOD_2": 3.0,
+    "FUND_MOD_3": 3.0,
+    "FUND_MOD_4": 3.0,
+    "FUND_MOD_5": 3.0,
     "BARCAMP_PARIS_23": 2.0,
     "NFTREP_V1": 1.0,
     "STUDY_GROUP_HOST_C2_22_23": 1.0,
@@ -139,7 +139,7 @@ class GroupHug(VotingMechanism):
             extracted_voters.append(Voter(choice, nfts))
         
         # Analyze election results
-        aggregate_vote = self.vote(extracted_candidates, extracted_voters)
+        aggregate_vote = self.vote(extracted_candidates, extracted_voters, verbose = True)
         winner = self.declare_winner(aggregate_vote)
 
         return (winner, aggregate_vote)
@@ -175,11 +175,10 @@ class GroupHug(VotingMechanism):
 
     def weight_intellectual(self, voter):
 
-            w = 0 
-            nfts = voter.nfts
-            
-            for intellectual_nft in self.intellectuals_nft_list:
-                w += self.nft_weights.get(intellectual_nft, 0)
+            w = 0             
+            for nft in voter.nfts:
+                if nft in self.intellectuals_nft_list:
+                    w += self.nft_weights[nft]
 
             return w
 
@@ -260,12 +259,12 @@ class GroupHug(VotingMechanism):
         else: return {c: round(100 * points[c] / total) for c in points}
     
     # Helper function to convert a dicitionary to a more readable form. 
-    def str_dict(d):
+    def str_dict(self, d):
         return str(dict(sorted(d.items())))
 
 
     # Main vote-counting mechanics
-    def vote(self, candidates, voters, verbose: str = False):
+    def vote(self, candidates, voters, verbose = False):
         eligible = [v for v in voters if not v.isCandidate]   # Candidates are not allowed to vote!
 
         experts = self.normalize(self.ask_the_experts(candidates, eligible))
@@ -278,7 +277,6 @@ class GroupHug(VotingMechanism):
             print("Intellectuals: " + self.str_dict(intellectuals))
             print("Participants: " + self.str_dict(participants))
             print("Community: " + self.str_dict(community))
-            print ("\n---\n")
 
         aggregate = {c: 0 for c in candidates}
 
