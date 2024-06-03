@@ -7,6 +7,8 @@ each voter has a score (based on their achievments) and assigns a proportion of 
 from typing import Any, Dict, Callable
 from mechanisms.voting_mechanism import VotingMechanism
 
+
+
 #Set default amounts for each NFT to contribute to individual 
 DEFAULT_NFT_SCORES = {
     "FUND_MOD1": 3.0,
@@ -88,13 +90,15 @@ class RankAndSlide(VotingMechanism):
             choice[candidate] = proportion / total
         return choice
 
-    def get_default_weighing_mechanism(self, voter: Dict[str, int]):
+    def get_default_weighing_mechanism(self, 
+                                       voter: Dict[str, int],
+                                       credential_info: Dict = DEFAULT_NFT_SCORES):
         score = 0
         for nft, amount in voter.items():
             if amount > 0:
                 # Take the score of the default NFT list, or 1 if it's not defined.
                 # If a user holds multiple (attended a session multiple times?), then add them up
-                score += amount * DEFAULT_NFT_SCORES.get(nft, 1)
+                score += amount * credential_info.get(nft, 0)
         return score
         
 
