@@ -9,7 +9,7 @@ Implements single choice quadratic credibility voting.
 """
 
 from typing import Any, Dict
-from voting_mechanism import VotingMechanism
+from mechanisms.voting_mechanism import VotingMechanism
 
 class SingleChoiceQuadraticCredibility(VotingMechanism):
         def calculate(self,
