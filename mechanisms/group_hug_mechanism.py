@@ -256,7 +256,7 @@ class GroupHug(VotingMechanism):
         total = sum(points.values())
 
         if total == 0: return {c: 0 for c in points}
-        else: return {c: round(100 * points[c] / total) for c in points}
+        else: return {c: round(100 * points[c] / total, 1) for c in points}
     
     # Helper function to convert a dicitionary to a more readable form. 
     def str_dict(self, d):
