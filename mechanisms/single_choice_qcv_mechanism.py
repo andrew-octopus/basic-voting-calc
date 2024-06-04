@@ -77,24 +77,24 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
 
             NOTE: All voter_credentials should have values. 
             """ 
-            weights_to_use = np.array(list(credential_weights.values()))
-            raw_voter_amounts = np.zeros(len(voter_credentials.keys()))
-
-            idx = 0
+            # Create a blank dictionary to keep information
+            raw_voter_amounts = {}
+            total_amount_all_voters = 0 
         
-            for voter, credentials in voter_credentials.items():
-                # Find raw voter weight and put in index array
-                credentials_to_use = np.array(list(credentials))
-                raw_voter_amounts[idx] = np.dot(credentials_to_use, 
-                                          weights_to_use) 
-                # Increment index
-                idx = idx + 1
+            # For each voter and their list of credentials
+            for voter, individual_voter_credentials in voter_credentials.items():
+                # Create an entry in the dictionary for their total weight
+                raw_voter_amounts[voter] = 0
+                # Loop over their credentials and add the total amount 
+                for credential in individual_voter_credentials.keys():
+                     individual_credential_weight = weights_to_use.get(credential, 0)
+                     raw_voter_amounts[voter] += individual_credential_weight
+                     total_amount_all_voters += individual_credential_weight
 
-            
-            total_voter_amount = np.sum(raw_voter_amounts)
-            normalized_voter_amounts = np.divide(raw_voter_amounts,
-                                                  total_voter_amount)
-            final_voter_points = total_amount_to_allocate * normalized_voter_amounts
+            normalized_voter_amounts = {voter: raw_voter_amounts.get(voter)/total_amount_all_voters
+                                        for voter in voter_credentials.keys()}
+            final_voter_points = {voter: total_amount_to_allocate * normalized_voter_amounts.get(voter)
+                                  for voter in voter_credentials.keys()}
 
             return final_voter_points
 
