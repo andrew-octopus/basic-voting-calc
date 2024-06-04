@@ -7,8 +7,6 @@ each voter has a score (based on their achievments) and assigns a proportion of 
 from typing import Any, Dict, Callable
 from mechanisms.voting_mechanism import VotingMechanism
 
-
-
 #Set default amounts for each NFT to contribute to individual 
 DEFAULT_NFT_SCORES = {
     "FUND_MOD1": 3.0,
@@ -46,7 +44,8 @@ class RankAndSlide(VotingMechanism):
             The proportion can be any number, all proportions will be normalized to sum to 1.
     """
 
-    def __init__(self):
+    def __init__(self, 
+                 ):
         super().__init__()
         self.weighing_mechanism = self.get_default_weighing_mechanism
 

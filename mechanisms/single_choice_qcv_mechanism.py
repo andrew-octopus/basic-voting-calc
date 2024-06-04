@@ -16,7 +16,7 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
                   voters: Dict[str, Dict[str, Any]],
                   voter_choices: Dict[str, Any]):
             """
-            Implements a single winner Quadratic Credibility mechanism, as authored by @flocke. 
+            Implements a single winner Quadratic Credibility mechanism, as authored by @flocke and Jade. 
 
             Step 0. Elsewhere, voters have been assigned points. 
             STep 1. Voters allocate points to candidates.
@@ -63,10 +63,11 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
 
             return winner, candidate_allocations
         
-        def allocate_points_from_credentials(voter_credentials: Dict[str,
-                                                     Literal[0,1,None]],
-                            credential_weights: Dict[str, float],
-                            total_amount_to_allocate: float = 10_000):
+        def allocate_points_from_credentials(self,
+                                             voter_credentials: Dict[str, Dict[str,
+                                                     Literal[0,1,None]]],
+                                credential_weights: Dict[str, float],
+                                total_amount_to_allocate: float = 10_000):
             """
             Takes a dictionary of voter credentials, with weights for each credential, 
             and applies the points available. 
@@ -76,14 +77,14 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
 
             NOTE: All voter_credentials should have values. 
             """ 
-            weights_to_use = np.array(credential_weights.values())
+            weights_to_use = np.array(list(credential_weights.values()))
             raw_voter_amounts = np.zeros(len(voter_credentials.keys()))
 
             idx = 0
         
             for voter, credentials in voter_credentials.items():
                 # Find raw voter weight and put in index array
-                credentials_to_use = np.array(credentials)
+                credentials_to_use = np.array(list(credentials))
                 raw_voter_amounts[idx] = np.dot(credentials_to_use, 
                                           weights_to_use) 
                 # Increment index
