@@ -87,13 +87,15 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
                 raw_voter_amounts[voter] = 0
                 # Loop over their credentials and add the total amount 
                 for credential in individual_voter_credentials.keys():
-                     individual_credential_weight = weights_to_use.get(credential, 0)
-                     raw_voter_amounts[voter] += individual_credential_weight
-                     total_amount_all_voters += individual_credential_weight
+                     voter_has_credential = voter_credentials.get(voter).get(credential,0)
+                     individual_credential_weight = credential_weights.get(credential, 0) 
+                     weight_to_add_to_voter = voter_has_credential * individual_credential_weight
+                     raw_voter_amounts[voter] += weight_to_add_to_voter
+                     total_amount_all_voters += weight_to_add_to_voter
 
             normalized_voter_amounts = {voter: raw_voter_amounts.get(voter)/total_amount_all_voters
                                         for voter in voter_credentials.keys()}
-            final_voter_points = {voter: total_amount_to_allocate * normalized_voter_amounts.get(voter)
+            final_voter_points = {voter: {"points" : total_amount_to_allocate * normalized_voter_amounts.get(voter)}
                                   for voter in voter_credentials.keys()}
 
             return final_voter_points
