@@ -84,7 +84,7 @@ class GroupHug(VotingMechanism):
     """
 
     def __init__(self, 
-                 nft_weights: Dict[str, float] = None,
+                 nft_weights: Dict[str, float] = DEFAULT_NFT_WEIGHTS,
                  experts_group_weight: float = DEFAULT_EXPERTS_GROUP_WEIGHT,
                  intellectuals_group_weight: float = DEFAULT_INTELLECTUALS_GROUP_WEIGHT,
                  participants_group_weight: float = DEFAULT_PARTICIPANTS_GROUP_WEIGHT,
