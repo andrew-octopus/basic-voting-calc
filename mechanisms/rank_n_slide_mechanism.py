@@ -145,10 +145,11 @@ class RankAndSlide(VotingMechanism):
     def normalize_proportions(self, choice: Dict[str, float]):
         # So that if a vote is passed in that doesn't add up to 1 the numbers get adjusted.
         # E.g. 0.1 & 3 & 0.4 & 5 -> 0.1/8.5 ~ 0.011 & 3/8.5 = 0.035 & 0.4/8.5 = 0.047 & 5/8.5 = 0.59
+        normalized_choices = {}
         total = sum(choice.values())
         for candidate, proportion in choice.items():
-            choice[candidate] = proportion / total
-        return choice
+            normalized_choices[candidate] = proportion / total
+        return normalized_choices
     
     def get_default_weighing_mechanism(self, 
                                        voter: Dict[str, int],

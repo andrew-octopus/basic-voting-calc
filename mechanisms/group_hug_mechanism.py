@@ -174,7 +174,6 @@ class GroupHug(VotingMechanism):
     ####################################
 
     def weight_intellectual(self, voter):
-
             w = 0             
             for nft in voter.nfts:
                 if nft in self.intellectuals_nft_list:
