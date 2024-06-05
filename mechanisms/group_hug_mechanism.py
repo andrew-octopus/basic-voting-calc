@@ -59,6 +59,7 @@ DEFAULT_PARTICIPANTS_NFT_LIST = [
                                 "STUDY_GROUP_HOST_C2_22_23",
                                 "STUDY_GROUP_HOST_360_22",
                                 "STUDY_GROUP_HOST_FUND_22_23",
+                                "ETHCC_23",
                                 "LIVE_TRACK_1",
                                  "LIVE_TRACK_2",
                                  "LIVE_TRACK_3",
@@ -84,30 +85,29 @@ class GroupHug(VotingMechanism):
 
     def __init__(self, 
                  nft_weights: Dict[str, float] = None,
-                 experts_group_weight: float = None,
-                 intellectuals_group_weight: float = None,
-                 participants_group_weight: float = None,
-                 community_group_weight: float = None,
-                 experts_nft_list: List[str] = None,
-                 intellectuals_nft_list: List[str] = None,
-                 participants_nft_list: List[str] = None,
-                 community_nft_list: List[str] = None):
+                 experts_group_weight: float = DEFAULT_EXPERTS_GROUP_WEIGHT,
+                 intellectuals_group_weight: float = DEFAULT_INTELLECTUALS_GROUP_WEIGHT,
+                 participants_group_weight: float = DEFAULT_PARTICIPANTS_GROUP_WEIGHT,
+                 community_group_weight: float = DEFAULT_COMMUNITY_GROUP_WEIGHT,
+                 experts_nft_list: List[str] = DEFAULT_EXPERTS_NFT_LIST,
+                 intellectuals_nft_list: List[str] = DEFAULT_INTELLECTUALS_NFT_LIST,
+                 participants_nft_list: List[str] = DEFAULT_PARTICIPANTS_NFT_LIST,
+                 community_nft_list: List[str] = DEFAULT_COMMUNITY_NFT_LIST):
 
         # Set the default NFT weights for each NFT
-        self.nft_weights = DEFAULT_NFT_WEIGHTS if nft_weights is None else nft_weights
+        self.nft_weights = nft_weights
 
         # Set the group weights to constructor inputs, or default values if not set 
-        self.experts_group_weight = DEFAULT_EXPERTS_GROUP_WEIGHT if experts_group_weight is None else experts_group_weight
-        self.intellectuals_group_weight = DEFAULT_INTELLECTUALS_GROUP_WEIGHT if intellectuals_group_weight is None else intellectuals_group_weight
-        self.participants_group_weight = DEFAULT_PARTICIPANTS_GROUP_WEIGHT if participants_group_weight is None else participants_group_weight
-        self.community_group_weight = DEFAULT_COMMUNITY_GROUP_WEIGHT if community_group_weight is None else community_group_weight
+        self.experts_group_weight = experts_group_weight
+        self.intellectuals_group_weight = intellectuals_group_weight
+        self.participants_group_weight = participants_group_weight
+        self.community_group_weight = community_group_weight
 
         # Set the qualifications required to belong to each group
-        self.experts_nft_list = DEFAULT_EXPERTS_NFT_LIST if experts_nft_list is None else experts_nft_list
-        self.intellectuals_nft_list = DEFAULT_INTELLECTUALS_NFT_LIST if intellectuals_nft_list is None else intellectuals_nft_list
-        self.participants_nft_list = DEFAULT_PARTICIPANTS_NFT_LIST if participants_nft_list is None else participants_nft_list
-        self.community_nft_list = DEFAULT_COMMUNITY_NFT_LIST if community_nft_list is None else community_nft_list
-        
+        self.experts_nft_list = experts_nft_list
+        self.intellectuals_nft_list = intellectuals_nft_list 
+        self.participants_nft_list = participants_nft_list 
+        self.community_nft_list = community_nft_list 
 
     def calculate(self, voters: Dict[str, Dict[str, Any]], 
                   voter_choices: Dict[str, str]):

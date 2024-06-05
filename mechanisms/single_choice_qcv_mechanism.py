@@ -16,7 +16,7 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
                   voters: Dict[str, Dict[str, Any]],
                   voter_choices: Dict[str, Any]):
             """
-            Implements a single winner Quadratic Credibility mechanism, as authored by @flocke. 
+            Implements a single winner Quadratic Credibility mechanism, as authored by @flocke and Jade. 
 
             Step 0. Elsewhere, voters have been assigned points. 
             STep 1. Voters allocate points to candidates.
@@ -63,10 +63,11 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
 
             return winner, candidate_allocations
         
-        def allocate_points_from_credentials(voter_credentials: Dict[str,
-                                                     Literal[0,1,None]],
-                            credential_weights: Dict[str, float],
-                            total_amount_to_allocate: float = 10_000):
+        def allocate_points_from_credentials(self,
+                                             voter_credentials: Dict[str, Dict[str,
+                                                     Literal[0,1,None]]],
+                                credential_weights: Dict[str, float],
+                                total_amount_to_allocate: float = 10_000):
             """
             Takes a dictionary of voter credentials, with weights for each credential, 
             and applies the points available. 
@@ -76,24 +77,26 @@ class SingleChoiceQuadraticCredibility(VotingMechanism):
 
             NOTE: All voter_credentials should have values. 
             """ 
-            weights_to_use = np.array(credential_weights.values())
-            raw_voter_amounts = np.zeros(len(voter_credentials.keys()))
-
-            idx = 0
+            # Create a blank dictionary to keep information
+            raw_voter_amounts = {}
+            total_amount_all_voters = 0 
         
-            for voter, credentials in voter_credentials.items():
-                # Find raw voter weight and put in index array
-                credentials_to_use = np.array(credentials)
-                raw_voter_amounts[idx] = np.dot(credentials_to_use, 
-                                          weights_to_use) 
-                # Increment index
-                idx = idx + 1
+            # For each voter and their list of credentials
+            for voter, individual_voter_credentials in voter_credentials.items():
+                # Create an entry in the dictionary for their total weight
+                raw_voter_amounts[voter] = 0
+                # Loop over their credentials and add the total amount 
+                for credential in individual_voter_credentials.keys():
+                     voter_has_credential = voter_credentials.get(voter).get(credential,0)
+                     individual_credential_weight = credential_weights.get(credential, 0) 
+                     weight_to_add_to_voter = voter_has_credential * individual_credential_weight
+                     raw_voter_amounts[voter] += weight_to_add_to_voter
+                     total_amount_all_voters += weight_to_add_to_voter
 
-            
-            total_voter_amount = np.sum(raw_voter_amounts)
-            normalized_voter_amounts = np.divide(raw_voter_amounts,
-                                                  total_voter_amount)
-            final_voter_points = total_amount_to_allocate * normalized_voter_amounts
+            normalized_voter_amounts = {voter: raw_voter_amounts.get(voter)/total_amount_all_voters
+                                        for voter in voter_credentials.keys()}
+            final_voter_points = {voter: {"points" : total_amount_to_allocate * normalized_voter_amounts.get(voter)}
+                                  for voter in voter_credentials.keys()}
 
             return final_voter_points
 
