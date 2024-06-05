@@ -84,7 +84,7 @@ class GroupHug(VotingMechanism):
     """
 
     def __init__(self, 
-                 nft_weights: Dict[str, float] = None,
+                 nft_weights: Dict[str, float] = DEFAULT_NFT_WEIGHTS,
                  experts_group_weight: float = DEFAULT_EXPERTS_GROUP_WEIGHT,
                  intellectuals_group_weight: float = DEFAULT_INTELLECTUALS_GROUP_WEIGHT,
                  participants_group_weight: float = DEFAULT_PARTICIPANTS_GROUP_WEIGHT,
@@ -139,8 +139,8 @@ class GroupHug(VotingMechanism):
             extracted_voters.append(Voter(choice, nfts))
         
         # Analyze election results
-        aggregate_vote = self.vote(extracted_candidates, extracted_voters, verbose = True)
-        winner = self.declare_winner(aggregate_vote)
+        (aggregate_vote, e, i, p, c) = self.vote(extracted_candidates, extracted_voters, verbose = True)
+        winner = self.declare_winner(aggregate_vote, e, c)
 
         return (winner, aggregate_vote)
 
@@ -256,7 +256,7 @@ class GroupHug(VotingMechanism):
         total = sum(points.values())
 
         if total == 0: return {c: 0 for c in points}
-        else: return {c: round(100 * points[c] / total) for c in points}
+        else: return {c: round(100 * points[c] / total, 1) for c in points}
     
     # Helper function to convert a dicitionary to a more readable form. 
     def str_dict(self, d):
@@ -294,12 +294,34 @@ class GroupHug(VotingMechanism):
 
         result = self.normalize(aggregate)
 
-        return result
+        return (result, experts, intellectuals, participants, community)
 
 
-    # NB: IN CASE OF A TIE THIS FUNCTION RETURNS THE CANDIDATE IT ENCOUNTERS FIRST IN THE INPUT!
-    def declare_winner(self, points):
-        return max(points, key = points.get)
+    def declare_winner(self, aggregate_vote, experts_vote, community_vote):
+
+        m = max(aggregate_vote.values())
+        winners = [k for k in aggregate_vote if aggregate_vote[k] == m]
+
+        if len(winners) == 1:       # There is a unique winner
+            return winners[0]
+        
+        print("Tie. We'll ask the experts to resolve it.")
+        e_filtered = {k: v for k,v in experts_vote.items() if k in winners}
+        m_e = max(e_filtered.values())
+        winners_e = [k for k in e_filtered if e_filtered[k] == m_e]
+
+        if len(winners_e) == 1:     # The experts prefer one winner over the other(s)
+            return winners_e[0]
+
+        print("Experts could not resolve tie. We'll ask the community.")
+        c_filtered = {k: v for k,v in community_vote.items() if k in winners}
+        m_c = max(c_filtered.values())
+        winners_c = [k for k in c_filtered if c_filtered[k] == m_c]
+
+        if len(winners_c) == 1:     # The community prefers one winner over the other(s)
+            return winners_c[0]
+        
+        raise Exception("A unique winner could not be found!")
 
    ############################################
    ## End vote-counting mechanics session.   ##
