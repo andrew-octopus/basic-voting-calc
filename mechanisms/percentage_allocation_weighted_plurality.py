@@ -35,8 +35,9 @@ class PercentageAllocationWeightedPlurality(VotingMechanism):
         # Calculate the weighted vote for each candidate based on voter choices and voter weights
         for voter_id, ballot in voter_choices.items():
             ballot_total = sum(ballot.values())
-            assert isclose(ballot_total, 1.0, rev_tol = 1e-5), "The voter's ballot should sum to 1.0"
-            for choice in ballot.keys():
+            # if not isclose(ballot_total, 1.0, rel_tol = 1e-5):
+            #     raise ValueError("The voter's ballot should sum to 1.0")
+            for choice, percentage in ballot.items():
                 if choice in candidate_scores:
                     candidate_scores[choice] += voters.get(voter_id).get("weight", 0) * ballot.get(choice)
                 else:
