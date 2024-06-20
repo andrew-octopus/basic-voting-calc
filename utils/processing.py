@@ -31,7 +31,7 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
     # Define the expected total number of token IDs
     TOTAL_TOKEN_IDS = 45
     # Calculate the total number of token IDs from the dataframe
-    total_token_ids = len(df_copy.index)
+    total_token_ids = len(df_copy.columns)
     assert total_token_ids == TOTAL_TOKEN_IDS, "The total number of token IDs is not as expected."
 
     # Define the expected number of token IDs with supply greater than 0
