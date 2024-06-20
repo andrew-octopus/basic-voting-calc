@@ -37,7 +37,7 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
     # Define the expected number of token IDs with supply greater than 0
     TOKEN_IDS_WITH_SUPPLY = 37
     # Calculate the number of token IDs with supply greater than 0 from the dataframe
-    token_ids_with_supply = len(df_copy[df_copy > 0].index)
+    token_ids_with_supply = len(df_copy[df_copy > 0].columns)
     assert token_ids_with_supply == TOKEN_IDS_WITH_SUPPLY, "The number of token IDs with supply > 0 is not as expected."
 
     # Check specific token IDs for a supply of zero
