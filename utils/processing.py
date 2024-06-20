@@ -18,14 +18,6 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
     # Make a copy of the dataframe to avoid modifying the original dataframe
     df_copy = df.copy()
 
-    # Check if every entry in the dataframe is either 0 or 1
-    for column in df_copy.columns:
-        invalid_values_count = (~df_copy[column].isin([0, 1])).sum()
-        if invalid_values_count > 0:
-            print(f"Column {column} contains {invalid_values_count} values other than 0 or 1.");
-            print(f"Setting these values to be in [0,1]")
-            df_copy[column] = df_copy[column].apply(lambda x: 1 if x > 1 else 0 if x > 0 else x)
-
     # Check for duplicate rows in the dataframe
     duplicate_rows = df_copy.duplicated()
     if duplicate_rows.any():
@@ -69,6 +61,14 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
     assert df_copy.loc[41].sum() == 0, "Token ID 41 should have a supply of zero."
     # Check a range of token IDs for a supply of zero
     assert df_copy.loc[43:45].sum().sum() == 0, "Token IDs 43-45 should have a supply of zero."
+
+     # Check if every entry in the dataframe is either 0 or 1
+    for column in df_copy.columns:
+        invalid_values_count = (~df_copy[column].isin([0, 1])).sum()
+        if invalid_values_count > 0:
+            print(f"Column {column} contains {invalid_values_count} values other than 0 or 1.");
+            print(f"Setting these values to be in {0,1}")
+            df_copy[column] = df_copy[column].apply(lambda x: 1 if x > 1 else 0 if x > 0 else x)
 
 
 def preprocess_data(df: pd.DataFrame,
