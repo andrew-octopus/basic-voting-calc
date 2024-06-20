@@ -18,20 +18,6 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
     # Make a copy of the dataframe to avoid modifying the original dataframe
     df_copy = df.copy()
 
-    # Check for duplicate rows in the dataframe
-    duplicate_rows = df_copy.duplicated()
-    if duplicate_rows.any():
-        print(f"Found {duplicate_rows.sum()} duplicate rows.")
-        # Remove duplicate rows from the dataframe
-        df_copy = df_copy[~duplicate_rows]
-
-    # Remove duplicate rows from the dataframe to ensure data integrity
-    df_copy.drop_duplicates(inplace=True)
-
-    # Check if there are any duplicate rows left after dropping duplicates
-    duplicate_count = df_copy.duplicated().sum()
-    assert duplicate_count == 0, f"Duplicate count is not zero: {duplicate_count}"
-
     # Count the total number of missing values in the dataframe
     missing_values_count = df_copy.isnull().sum().sum()
     assert missing_values_count == 0, f"Missing values count is not zero: {missing_values_count}"
@@ -61,6 +47,21 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
     assert df_copy.loc[41].sum() == 0, "Token ID 41 should have a supply of zero."
     # Check a range of token IDs for a supply of zero
     assert df_copy.loc[43:45].sum().sum() == 0, "Token IDs 43-45 should have a supply of zero."
+
+        # Check for duplicate rows in the dataframe
+    duplicate_rows = df_copy.duplicated()
+    if duplicate_rows.any():
+        print(f"Found {duplicate_rows.sum()} duplicate rows.")
+        print(f"Dropping duplicate rows.")
+        # Remove duplicate rows from the dataframe
+        df_copy = df_copy[~duplicate_rows]
+
+    # Remove duplicate rows from the dataframe to ensure data integrity
+    df_copy.drop_duplicates(inplace=True)
+
+    # Check if there are any duplicate rows left after dropping duplicates
+    duplicate_count = df_copy.duplicated().sum()
+    assert duplicate_count == 0, f"Duplicate count is not zero: {duplicate_count}"
 
      # Check if every entry in the dataframe is either 0 or 1
     for column in df_copy.columns:
