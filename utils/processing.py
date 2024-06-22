@@ -57,7 +57,7 @@ def validate_dataframe_june_19(df: pd.DataFrame) -> bool:
         if invalid_values_count > 0:
             print(f"Column {column} contains {invalid_values_count} values other than 0 or 1.");
             print(f"Setting these values to be in {0,1}")
-            df_copy[column] = df_copy[column].apply(lambda x: 1 if x > 1 else 0 if x > 0 else x)
+            df_copy[column] = df_copy[column].apply(lambda x: 1 if x > 1 else 0 if x < 0 else x)
 
     return df_copy
 
@@ -70,7 +70,7 @@ def preprocess_data(df: pd.DataFrame):
     # The second token ID column is then set to 0. This process is repeated for multiple pairs of token IDs.
 
     modified_df = df.copy()
-
+    
     modified_df['tokenId 1'] = modified_df[['tokenId 1', 'tokenId 2']].max(axis=1)
     modified_df['tokenId 2'] = 0
 
@@ -95,7 +95,7 @@ def add_tef_graduate_column(df: pd.DataFrame):
     # Create a copy of the original DataFrame to avoid modifying it directly
     df_copy = df.copy()
 
-    # Check that the sum of all correspondnig even entries is zero. 
+    # Check that the sum of all correspondnig evenID entries is zero. 
     assert df_copy['tokenId 2'].sum() == 0, "There should be no tokenId 2 in this DataFrame. "
     assert df_copy['tokenId 4'].sum() == 0, "There should be no tokenId 4 in this DataFrame. "
     assert df_copy['tokenId 6'].sum() == 0, "There should be no tokenId 6 in this DataFrame. "
@@ -110,7 +110,11 @@ def add_tef_graduate_column(df: pd.DataFrame):
     has_tef_module_5 = df_copy['tokenId 9']
     
     # Create a new column 'tef_graduate' that is True if all TEF modules are completed
-    df_copy['tef_graduate'] = (has_tef_module_1 & has_tef_module_2 & has_tef_module_3 & has_tef_module_4 & has_tef_module_5)
+    df_copy['tef_graduate'] = df_copy[['tokenId 1', 
+                                       'tokenId 3', 
+                                       'tokenId 5',
+                                        'tokenId 7',
+                                        'tokenId 9']].all(axis = 1)
     
     # Return the modified DataFrame with the new 'tef_graduate' column
     return df_copy 
@@ -181,7 +185,9 @@ def create_dict_for_equal_cweights(df: pd.DataFrame,
     
     # Count the number of unique identities/wallets that match the TE Graduates criteria
     number_tef_graduates= df['tef_graduate'].sum()
+    print(f"There are {number_tef_graduates} TEF graduates.")
 
+    assert len(tef_graduates == number_tef_graduates), print("The number of TEF graduates here has an issue. ")
     # Reality check that the weights match up
     assert original_graduate_cweight == (number_tef_graduates * total_tef_tokenIds_weight), "Unexpected result with TEF graduates weight. "
 
@@ -190,6 +196,7 @@ def create_dict_for_equal_cweights(df: pd.DataFrame,
     ####################################################################
 
     original_student_cweight = original_total_cweight - (original_expert_cweight + original_graduate_cweight)
+    print(f"The original student cweight is: {original_student_cweight}.")
 
     ####################################################################
     ## Create a copy of the weights dictionary, to change specific    ##
@@ -208,12 +215,14 @@ def create_dict_for_equal_cweights(df: pd.DataFrame,
     if original_student_cweight > original_graduate_cweight:
         print("Original student cweight is greater than original graduate cweight.")
         print("Scaling graduate cweight.")
+
         tef_graduate_boost = original_student_cweight/number_tef_graduates - total_tef_tokenIds_weight
         scaled_graduate_cweight = (total_tef_tokenIds_weight + tef_graduate_boost) * number_tef_graduates
         scaled_student_cweight = original_student_cweight
         assert isclose(scaled_graduate_cweight - scaled_student_cweight, 0)
+
         print(f"The TEF graduate boost to make the two cweights equal is: {tef_graduate_boost}.")
-        print(f"After calculation, final graduate cweight should be: {scaled_student_cweight}.")
+        print(f"After calculation, final student cweight should be: {scaled_student_cweight}.")
         print(f"After calculation, final graduate cweight should be: {scaled_graduate_cweight}.")
 
         modified_weights_dict['tef_graduate'] = tef_graduate_boost
@@ -241,20 +250,33 @@ def create_dict_for_equal_cweights(df: pd.DataFrame,
         print("Original expert cweight already greater than original graduate cweight.")
         scaled_expert_cweight = original_expert_cweight
 
-    print("\n Final Check: \n")
+    ##########################################################
+    ## We need to get a new DataFrame for TEF graduates     ##
+    ## that incorporates the `tef_graduate` column.         ##
+    ##########################################################
     
     if not('tef_graduate') in graduate_tokenIds_list:
         new_graduate_tokenIds_list = graduate_tokenIds_list + ['tef_graduate']
     else:
-        new_graduate_tokenIds_list = copy.deepcopy(graduate_tokenIds_list)
+        new_graduate_tokenIds_list = deepcopy(graduate_tokenIds_list)
+
+    new_tef_graduate_df = tef_graduates[new_graduate_tokenIds_list] 
+    print("The columns of this new TEF graduate df are: \n")
+    for col in new_tef_graduate_df:
+        print(col)
+
+    print(f"There are {len(new_tef_graduate_df)} graduates in this DataFrame.")
+    print(f"The weight of TEF graduate is: {modified_weights_dict.get('tef_graduate')}")
+
+    print("\n Final Check: \n")
 
     actual_final_total_cweight = calculate_nft_weighted_sum(df = df, 
                                weights = modified_weights_dict)
     actual_final_expert_cweight = calculate_nft_weighted_sum(df = expert_only_df, 
                                weights = modified_weights_dict)
-    actual_final_graduate_cweight = calculate_nft_weighted_sum(df = tef_graduates,
+    actual_final_graduate_cweight = calculate_nft_weighted_sum(df = new_tef_graduate_df,
                                      weights = modified_weights_dict)
-    actual_final_student_cweight = actual_final_total_weight - (actual_final_expert_weight + actual_final_graduate_cweight)
+    actual_final_student_cweight = actual_final_total_cweight - (actual_final_expert_cweight + actual_final_graduate_cweight)
 
 
     print(f"Actual final total cweight is {actual_final_total_cweight}.")
@@ -262,9 +284,8 @@ def create_dict_for_equal_cweights(df: pd.DataFrame,
     print(f"Actual final graduate cweight is {actual_final_graduate_cweight}.")
     print(f"Actual final student cweight is: {actual_final_student_cweight}.")
 
-    assert isclose(actual_final_expert_cweight - actual_final_graduate_cweight, 0), "Final expert cweight and graduate cweight are not close enough."
-    assert isclose(actual_final_graduate_cweight - actual_Final_student_cweight, 0), "Final graduate cweight and final student cweight are not close enough."
-
+    assert isclose(actual_final_expert_cweight - actual_final_graduate_cweight, 0, abs_tol=1e-5), "Final expert cweight and graduate cweight are not close enough."
+    assert isclose(actual_final_graduate_cweight - actual_final_student_cweight, 0, abs_tol=1e-5), "Final graduate cweight and final student cweight are not close enough."
 
     return modified_weights_dict
 
