@@ -5,7 +5,8 @@ class SimpleCredentialWeightingMechanism:
     - the possible credentials (list)
     - the weights for each credential (dictionary)
     """
-
+    
+    import pandas as pd
     from typing import Dict, List
 
     def __init__(self,
@@ -63,6 +64,34 @@ class SimpleCredentialWeightingMechanism:
             voter_weights_dict[voter] = {"weight": voter_weight}
 
         return voter_weights_dict
+    
+    def calculate_dataframes_voter_weights(self,
+                                          credential_df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Calculates the weight of each voter based on their credentials for different weight assignment schemes.
+        
+        This method takes a pandas DataFrame where the column names are the credentials, and the rows are names for different weight assignment schemes.
+        It calculates the weight of each voter for each scheme by summing up the weights of their credentials.
+        If a credential is not found in thce credential_weights dictionary, its weight is considered 0.
+        
+        Parameters:
+        pd.DataFrame: A DataFrame where the column names are the credentials, and the rows are names for different weight assignment schemes.
+        
+        Returns:
+        pd.DataFrame: A DataFrame whose rows are voters, and whose columns are the names of the different weight assignment schemes.
+        """
+        # Initialize an empty DataFrame to hold the voter weights for different schemes
+        voter_weights_df = pd.DataFrame()
+        
+        # Iterate over each column (credential) in the input DataFrame
+        for cred, weights in voter_weights_df.items():
+            # Calculate the weight of each voter for the current credential
+            voter_weights = self.calc_cred_list_weight(weights.tolist())
+            # Add the weights as a column to the voter_weights_df DataFrame
+            voter_weights_df[cred] = voter_weights
+        
+        return voter_weights_df
+        
     
 
 
