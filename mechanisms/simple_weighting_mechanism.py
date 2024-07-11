@@ -6,6 +6,8 @@ class SimpleCredentialWeightingMechanism:
     - the weights for each credential (dictionary)
     """
 
+    from typing import Dict, List
+
     def __init__(self,
                  credentials: List[str],
                  credential_weights: Dict[str, float]):
@@ -14,7 +16,8 @@ class SimpleCredentialWeightingMechanism:
 
     def calc_cred_list_weight(self,
                               credential_list: List[str]) -> float:
-        weight = sum([cred * self.credential_weights.get(cred) for cred in credential_list])
+        weight = sum([(cred * self.credential_weights.get(cred))
+                      for cred in credential_list])
         return weight
          
 
