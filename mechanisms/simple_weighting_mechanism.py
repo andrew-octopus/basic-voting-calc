@@ -7,6 +7,7 @@ class SimpleCredentialWeightingMechanism:
     """
     
     import pandas as pd
+    from copy import deepcopy
     from typing import Dict, List
 
     def __init__(self,
@@ -16,7 +17,8 @@ class SimpleCredentialWeightingMechanism:
         self.credential_weights = credential_weights
 
     def calc_cred_list_weight(self,
-                              credential_list: List[str]) -> float:
+                              cred_list: List[str],
+                              cred_weights_list: Dict[str, float] = None) -> float:
         """
         Calculates the total weight of a list of credentials based on their weights.
         
@@ -29,15 +31,21 @@ class SimpleCredentialWeightingMechanism:
         Returns:
         float: The total weight of the credential list.
         """
-        
+
+        # Determine if custom credential weights were provided
+        if cred_weights_list is None:
+            cred_weights_to_use = deepcopy(cred_weights_list)
+        else:
+            cred_weights_to_use = deepcopy(self.credential_weights)
+
         # Initialize weight to 0
         weight = 0
         
         # Iterate over each credential in the credential list
-        for cred in credential_list:
+        for cred in cred_weights_to_use:
             # Add the weight of the current credential to the total weight
             # If the credential is not found in credential_weights, get() returns 0 by default
-            weight += self.credential_weights.get(cred, 0)
+            weight += cred_weights_to_use.get(cred, 0)
         
         return weight
          
