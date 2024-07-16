@@ -1,2 +1,10 @@
 # basic-voting-calc
-A basic voting calculator for use in the TE Academy Reputation-Weighted-Voting course. 
+
+## Overview
+
+This repository offers tools for lightweight, easily extensible tools for voting calculation.
+
+## Examples
+
+TODO
+
