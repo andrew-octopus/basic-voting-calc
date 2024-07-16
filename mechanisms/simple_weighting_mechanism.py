@@ -1,3 +1,7 @@
+import pandas as pd
+from copy import deepcopy
+from typing import Dict, List
+
 class SimpleCredentialWeightingMechanism:
     """
     This is a simple mechanism that weights individual voters according to their credentials.
@@ -6,10 +10,6 @@ class SimpleCredentialWeightingMechanism:
     - the weights for each credential (dictionary)
     """
     
-    import pandas as pd
-    from copy import deepcopy
-    from typing import Dict, List
-
     def __init__(self,
                  credentials: List[str] = None,
                  credential_weights: Dict[str, float] = None):
@@ -33,7 +33,7 @@ class SimpleCredentialWeightingMechanism:
         """
 
         # Determine if custom credential weights were provided
-        if cred_weights_list is None:
+        if cred_weights_list is not None:
             cred_weights_to_use = deepcopy(cred_weights_list)
         else:
             cred_weights_to_use = deepcopy(self.credential_weights)
@@ -42,7 +42,7 @@ class SimpleCredentialWeightingMechanism:
         weight = 0
         
         # Iterate over each credential in the credential list
-        for cred in cred_weights_to_use:
+        for cred in cred_list:
             # Add the weight of the current credential to the total weight
             # If the credential is not found in credential_weights, get() returns 0 by default
             weight += cred_weights_to_use.get(cred, 0)
@@ -68,7 +68,7 @@ class SimpleCredentialWeightingMechanism:
         voter_weights_dict = {} # Create new dictionary to hold voter weights
 
         for voter, voter_cred_list in voters.items(): # Going over each voter
-            voter_weight = self.calc_cred_list_weight(voter_cred_list) # Get total weight of voter's credentials
+            voter_weight = self.calc_total_cred_weights(voter_cred_list) # Get total weight of voter's credentials
             voter_weights_dict[voter] = {"weight": voter_weight} # Set that voter weight
 
         return voter_weights_dict
