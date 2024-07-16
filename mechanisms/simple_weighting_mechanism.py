@@ -16,7 +16,7 @@ class SimpleCredentialWeightingMechanism:
         self.credentials = credentials
         self.credential_weights = credential_weights
 
-    def calc_cred_list_weight(self,
+    def calc_total_cred_weights(self,
                               cred_list: List[str],
                               cred_weights_list: Dict[str, float] = None) -> float:
         """
@@ -50,8 +50,8 @@ class SimpleCredentialWeightingMechanism:
         return weight
          
 
-    def calculate_voter_weights(self, 
-                                voters: Dict[str, List[str]]) -> Dict[str, float]:
+    def calc_voter_weights(self, 
+                           voters: Dict[str, List[str]]) -> Dict[str, float]:
         """
         Calculates the weight of each voter based on their credentials.
         
@@ -68,8 +68,8 @@ class SimpleCredentialWeightingMechanism:
         voter_weights_dict = {} # Create new dictionary to hold voter weights
 
         for voter, voter_cred_list in voters.items(): # Going over each voter
-            voter_weight = self.calc_cred_list_weight(voter_cred_list)
-            voter_weights_dict[voter] = {"weight": voter_weight}
+            voter_weight = self.calc_cred_list_weight(voter_cred_list) # Get total weight of voter's credentials
+            voter_weights_dict[voter] = {"weight": voter_weight} # Set that voter weight
 
         return voter_weights_dict
 
